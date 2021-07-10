@@ -30,6 +30,7 @@ import (
 	"math/big"
 	"reflect"
 	"time"
+	"fmt"
 
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/encoding/charmap"
@@ -219,7 +220,9 @@ func (x *xSQLVAR) scantype() reflect.Type {
 }
 
 func (x *xSQLVAR) _parseTimezone(raw_value []byte) *time.Location {
-	timezone := getTimezoneNameByID(int(bytes_to_bint32(raw_value)))
+	fmt.Println("_parseTimezone")
+	fmt.Println(raw_value)
+	timezone := getTimezoneNameByID(int(bytes_to_bint16(raw_value)))
 	tz, _ := time.LoadLocation(timezone)
 	return tz
 }
@@ -477,6 +480,8 @@ func (x *xSQLVAR) value(raw_value []byte, timezone string, charset string) (v in
 	case SQL_TYPE_TIMESTAMP:
 		v = x.parseTimestamp(raw_value, timezone)
 	case SQL_TYPE_TIME_TZ:
+		fmt.Println("value()")
+		fmt.Println(raw_value)
 		v = x.parseTimeTz(raw_value)
 	case SQL_TYPE_TIMESTAMP_TZ:
 		v = x.parseTimestampTz(raw_value)

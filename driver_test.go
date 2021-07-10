@@ -456,9 +456,12 @@ func TestTimeZone(t *testing.T) {
     `
 	conn.Exec(sql)
 	conn.Exec("insert into test_timezone(t) values (?)", time.Now())
+	// conn.Exec("insert into test_timezone(t) values ('01:23')")
+	// conn.Exec("insert into test_timezone(t) values ('12:34+09:00')")
 
 	var tz time.Time
 	err = conn.QueryRow("SELECT t FROM test_timezone").Scan(&tz)
+	fmt.Println(tz)
 
 	conn.Close()
 }
