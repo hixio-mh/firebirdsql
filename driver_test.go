@@ -436,6 +436,34 @@ func TestDecFloat(t *testing.T) {
 	conn.Close()
 }
 
+
+func TestTimeZone(t *testing.T) {
+	// https://github.com/nakagami/firebirdsql/issues/128
+	conn, err := sql.Open("firebirdsql_createdb", GetTestDSN("test_timezone_"))
+	if err != nil {
+		t.Fatalf("Error connecting: %v", err)
+	}
+
+	firebird_major_version := get_firebird_major_version(conn)
+	if firebird_major_version < 4 {
+		return
+	}
+
+	sql := `
+        CREATE TABLE test_timezone (
+			t TIME WITH TIME ZONE
+        )
+    `
+	conn.Exec(sql)
+	conn.Exec("insert into test_timezone(t) values (?)", time.Now())
+
+	var tz time.Time
+	err = conn.QueryRow("SELECT t FROM test_timezone").Scan(&tz)
+
+	conn.Close()
+}
+
+
 func TestInt128(t *testing.T) {
 	// https://github.com/nakagami/firebirdsql/issues/129
 	conn, err := sql.Open("firebirdsql_createdb", GetTestDSN("test_int128_"))
